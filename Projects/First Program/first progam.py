@@ -11,25 +11,68 @@
 
 #!/usr/bin/env python
 import wx
+ART_SETTINGS = wx.NewId()
+ART_HOME = wx.NewId()
+
+class MyProvider(wx.ArtProvider):
+    def __init__(self):
+        wx.ArtProvider.__init__(self)
+    def CreateBitmap(self, id, client, size):
+        if (id == "ART_SETTINGS"):
+            return wx.Bitmap("settings.png")
+        if (id == "ART_HOME"):
+            return wx.Bitmap("home.png")
+    app = wx.App(False)
+    app.MainLoop()
+
+wx.ArtProvider.Push(MyProvider())
+
+FRAMETB = True
+TBFLAGS = (wx.TB_VERTICAL | wx.TB_TEXT | wx.NO_BORDER | wx.TB_NODIVIDER)
+
 class MyFrame (wx.Frame):
     #Deriving a new class of Frame
     def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, title=title, size=(-1,-1))
-        self.control = wx.TextCtrl(self, style=wx.TE_MULTILINE)
-        self.CreateStatusBar() #A Statusbar in the bottom of the window
+        wx.Frame.__init__(self, parent, title=title, size=(1500, 800))
 
         #Setting up the menu
         filemenu = wx.Menu()
+        helpmenu = wx.Menu()
 
         #wx.ID_ABOUT and wx.ID_EXIT are standard IDs
-        menuAbout = filemenu.Append(wx.ID_ABOUT, "&About","Information about this program")
+        menuAbout = helpmenu.Append(wx.ID_ABOUT, "&About","Information about this program")
         menuOpen = filemenu.Append(wx.ID_OPEN, "&Open", "Open a file")
         menuExit = filemenu.Append(wx.ID_EXIT,"E&xit","Exit this program")
 
         #Creating the menubar
         menuBar = wx.MenuBar()
         menuBar.Append(filemenu, "&File") #Adding Filemenu to the MenuBar
+        menuBar.Append(helpmenu, "&Help") #Adding Help to the menu bar
         self.SetMenuBar(menuBar) #Adding the menubar to the frame content
+
+        #Creating the Tool bar
+        client = wx.Panel(self)
+        client.SetBackgroundColour(wx.NamedColor("GREY"))
+
+        if FRAMETB:
+            tb = self.CreateToolBar(TBFLAGS)
+        else:
+            tb = wx.ToolBar(client, style = TBFLAGS)
+            sizer = wx.BoxSizer(wx.HORIZONTAL)
+            sizer.Add(tb, -1, wx.EXPAND)
+            client.SetSizer(sizer)
+
+        self.CreateStatusBar() #A Statusbar in the bottom of the window
+
+        tsize = (52, 52)
+        home = wx.ArtProvider.GetBitmap("ART_HOME", wx.ART_TOOLBAR, tsize)
+        settings = wx.ArtProvider.GetBitmap("ART_SETTINGS", wx.ART_TOOLBAR, tsize)
+
+        tb.AddSimpleTool(1, home, "Home")
+        tb.AddSimpleTool(10, settings, "Settings")
+
+
+        tb.Realize()
 
         #Create Events
         self.Bind(wx.EVT_MENU, self.OnAbout, menuAbout)

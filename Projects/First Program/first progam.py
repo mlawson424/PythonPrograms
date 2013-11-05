@@ -15,6 +15,7 @@ ART_SETTINGS = wx.NewId()
 ART_HOME = wx.NewId()
 
 class MyProvider(wx.ArtProvider):
+    #Creating a New Art Provider for Images
     def __init__(self):
         wx.ArtProvider.__init__(self)
     def CreateBitmap(self, id, client, size):
@@ -22,6 +23,8 @@ class MyProvider(wx.ArtProvider):
             return wx.Bitmap("settings.png")
         if (id == "ART_HOME"):
             return wx.Bitmap("home.png")
+        if (id == "ART_CALENDAR"):
+            return wx.Bitmap("clock.png")
     app = wx.App(False)
     app.MainLoop()
 
@@ -64,14 +67,18 @@ class MyFrame (wx.Frame):
 
         self.CreateStatusBar() #A Statusbar in the bottom of the window
 
+        #Pull Images from Art Provider
         tsize = (52, 52)
         home = wx.ArtProvider.GetBitmap("ART_HOME", wx.ART_TOOLBAR, tsize)
+        calendar = wx.ArtProvider.GetBitmap("ART_CALENDAR", wx.ART_TOOLBAR, tsize)
         settings = wx.ArtProvider.GetBitmap("ART_SETTINGS", wx.ART_TOOLBAR, tsize)
 
+        #Add the Tools to the Bar
         tb.AddSimpleTool(1, home, "Home")
+        tb.AddSimpleTool(2, calendar, "Calendar")
         tb.AddSimpleTool(10, settings, "Settings")
 
-
+        #Render Tool bar
         tb.Realize()
 
         #Create Events
@@ -104,5 +111,4 @@ class MyFrame (wx.Frame):
 
 app = wx.App(False) #Create a new app, don't redirect stdout/stderr to a window
 frame = MyFrame(None, "First Program") #A Frame is a top-level window
-#frame.Show(True) #Show the frame
 app.MainLoop()
